@@ -396,7 +396,7 @@ useEffect(() => {
                         type="submit"
                         className="btn btn-primary  btn-md"
                         onClick={handleSubmit}
-                        disabled={getStockEntryNO.status_code == 0 ? false : true}
+                        disabled={getStockEntryNO && getStockEntryNO.status_code == 0 ? false : true}
                       >
                         <i className="fa-solid fa-check mr-2"></i> Save
                       </button>
