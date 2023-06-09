@@ -1,4 +1,4 @@
-          import { useEffect, useState } from "react";
+          import { useEffect, useState, useRef } from "react";
           import { useSelector } from "react-redux";
           import MssrService from "../../axios/services/api/mssr";
           import { useNavigate } from "react-router-dom";
@@ -6,7 +6,7 @@
           import {maxLengthCheck} from "../../pages/pages/utils/maxLengthInput"
 
           import Swal from "sweetalert2";
-          const ViewOrderModel = ({ id }) => {
+          const ViewOrderModel = ({ id, reset }) => {
             const mssr = useSelector((state) => state.mssr);
             const { getViewStockDetailsLines, getStockEntryNO } = mssr;
             const navigate = useNavigate()
@@ -16,98 +16,74 @@
             const [damageQtyData, setDamageQtyData] = useState([]);
             const [inputData, setInputData] = useState([]);
 
-            ////////
 	const [saveMssrData, setSaveMssrData] = useState([]);
-
-
-            const setReset = () =>{
-              console.log("setSaveMssrData", saveMssrData)
-
-              // setQtySaleableData([]);
-              // setReturnQtyData([]);
-              // setDamageQtyData([])
-            }
-         
-
-            const handleQtyChange = (e, mssr, field) =>{
-              const qtySaleable = document.getElementById(
-                `saleableStockQty-${mssr.item_code}`
-              );
-
-              if(field === "qtySaleable"){
-              setSaveMssrData((getViewStockDetailsLines) =>
-              getViewStockDetailsLines.map((data) =>
-                mssr.item_code === data.item_code
-                  ? { ...data, cls_stk_qty_saleable: e.target.value }
-                  : data
-              )
-            );
-            }
-            }
-
-            //////////
-            
-            const handleInputChange = (e, index, field) => {
-              const { value } = e.target;
-              if (field === "qtySaleable") {
-                setQtySaleableData((prev) => {
-                  const updatedData = [...prev];
-                  updatedData[index] = value ;
-                  return updatedData;
-                });
-              } else if (field === "returnQty") {
-                setReturnQtyData((prev) => {
-                  const updatedData = [...prev] ;
-                  updatedData[index] = value ;
-                  return updatedData;
-                });
-              } else if (field === "damageQty") {
-                setDamageQtyData(( prev) => {
-                  const updatedData =[...prev];
-                  updatedData[index] = value ;
-                  return updatedData;
-                });
-              }
+      
+///////////////////////////////////////////////////////////////////////////
+const [data, setData] = useState([]);
+const [initialData, setInitialData] = useState([]);
+useEffect(() => {
+  if(getViewStockDetailsLines && getViewStockDetailsLines.length>0)
+  {
+    setInitialData(getViewStockDetailsLines) ;
+    setData(getViewStockDetailsLines)
+  }
+}, [getViewStockDetailsLines])
+            const [changedData, setChangedData] = useState([]);
+            const handleInputChange = (id, field, value) => {
+              const updatedData = data.map(obj => {
+                if (obj.item_code === id) {
+                  return { ...obj, [field]: value };
+                }
+                return obj;
+              });
+              setData(updatedData);
             };
-            const handleSubmit = async () => {
-              // const stock_entry_no="CS2300042";
+            const handleSubmit = async(event) => {
+              event.preventDefault();
               const stock_entry_no  = getStockEntryNO.mssr_entry_no;
-              const newInputData = getViewStockDetailsLines.map((mssr, index) => ({
-                itemCode: mssr.item_code,
-                qtySaleable: qtySaleableData[index],
-                returnQty: returnQtyData[index],
-                damageQty: damageQtyData[index],
-              })).filter(item => item.qtySaleable !== undefined ||
-                 item.returnQty !== undefined || 
-                 item.damageQty !== undefined);
-            
-              if (newInputData.length > 0) {
-                console.log("if condition is running ==");
-                // await MssrService.getUpdateStockDetails(userProfile, stock_entry_no, newInputData)
-                //   .then((response) => {
-                //     Swal.fire({
-                //       title: `${response.data.data.message}`,
-                //       text: `${response.data.data.add_message}`,
-                //       showCancelButton: false,
-                //       showCloseButton: false,
-                //       confirmButtonColor: "#3085d6",
-                //       confirmButtonText: "OK",
-                //       customClass: {
-                //         confirmButton: "your-custom-class",
-                //       },
-                //     }).then((result) => {
-                //       if (result.isConfirmed) {
-                //         const closeButton = document.querySelector(".close");
-                //         if (closeButton) {
-                //           closeButton.click();
-                //         }
-                //       }
-                //     },
+              // Filter only the changed data objects
+              const changedDataObjects = data.filter(obj => {
+                const initialObj = initialData.find(initial => initial.item_code === obj.item_code);
+                return (
+                  initialObj.cls_stk_qty_damage !== obj.cls_stk_qty_damage ||
+                  initialObj.cls_stk_qty_saleable !== obj.cls_stk_qty_saleable ||
+                  initialObj.market_return_qty !== obj.market_return_qty
+                );
+              });
+              const submitData = changedDataObjects.map((mssr, index)=>({
+                item_code: mssr.item_code,
+                cls_stk_qty_saleable: mssr.cls_stk_qty_saleable,
+                cls_stk_qty_damage: mssr.cls_stk_qty_damage,
+                market_return_qty: mssr.market_return_qty
+              }));
+              // Log the changed data objects
+              // console.log('Changed Data:', changedDataObjects);
+              // console.log('submitData Data:', submitData);
+              //Call api for saving mssr object
+              if (submitData.length > 0) {
+                await MssrService.getUpdateStockDetails(userProfile, stock_entry_no, submitData)
+                  .then((response) => {
+                    Swal.fire({
+                      title: `${response.data.data.message}`,
+                      text: `${response.data.data.add_message}`,
+                      showCancelButton: false,
+                      showCloseButton: false,
+                      confirmButtonColor: "#3085d6",
+                      confirmButtonText: "OK",
+                      customClass: {
+                        confirmButton: "your-custom-class",
+                      },
+                    }).then((result) => {
+                      if (result.isConfirmed) {
+                        const closeButton = document.querySelector(".close");
+                        if (closeButton) {
+                          closeButton.click();
+                        }
+                      }
+                    },
                    
-                //     );
-                //   });
-                setInputData(newInputData);
-                console.log("Array of output", newInputData);
+                    );
+                  });
               } else {
                 Swal.fire({
                   title: "Please Fill in the Input",
@@ -119,8 +95,6 @@
               
               }
             };
-            
-
             return (
               <div
                 className="modal bd-example-modal-lg fade"
@@ -142,7 +116,7 @@
                         type="button"
                         data-dismiss="modal"
                         aria-label="Close"
-                        onClick={setReset}
+                        onClick={()=>reset()}
                       >
                         {" "}
                         <span aria-hidden="true">×</span>{" "}
@@ -181,35 +155,72 @@
                                   <td>{mssr.item_name}</td>
                                   <td>
                                     <input
-                                      // value={qtySaleableData}
+                                      defaultValue={mssr.cls_stk_qty_saleable}
+                                      disabled={
+                                        getStockEntryNO &&
+                                        getStockEntryNO.status_code == 0
+                                          ? false
+                                          : true
+                                      }
                                       type="number"
-                                      placeholder={mssr.cls_stk_qty_saleable}
+                                      id={`saleableStockQty-${mssr.item_code}`}
+                                      style={{ textAlign: "center" }}
+                                      min={0}
+                                      maxLength="3"
+                                      onInput={maxLengthCheck}
                                       onChange={(e) =>
                                         handleInputChange(
-                                          e,
-                                          index,
-                                          "qtySaleable"
+                                          mssr.item_code,
+                                          "cls_stk_qty_saleable",
+                                          e.target.value
                                         )
                                       }
                                     />
                                   </td>
                                   <td>
                                     <input
-                                      // value={returnQtyData}
+                                      defaultValue={mssr.market_return_qty}
+                                      disabled={
+                                        getStockEntryNO &&
+                                        getStockEntryNO.status_code == 0
+                                          ? false
+                                          : true
+                                      }
                                       type="number"
-                                      placeholder={mssr.market_return_qty}
+                                      id={`saleableStockQty-${mssr.item_code}`}
+                                      style={{ textAlign: "center" }}
+                                      min={0}
+                                      maxLength="3"
+                                      onInput={maxLengthCheck}
                                       onChange={(e) =>
-                                        handleInputChange(e, index, "returnQty")
+                                        handleInputChange(
+                                          mssr.item_code,
+                                          "market_return_qty",
+                                          e.target.value
+                                        )
                                       }
                                     />
                                   </td>
                                   <td>
                                     <input
-                                      // value={damageQtyData}
-                                      type="number"
-                                      placeholder={mssr.cls_stk_qty_damage}
+                                      defaultValue={mssr.cls_stk_qty_damage}
+                                      disabled={
+                                        getStockEntryNO && getStockEntryNO.status_code == 0
+                                          ? false
+                                          : true
+                                      }
+                                        type="number"
+                                        id={`saleableStockQty-${mssr.item_code}`}
+                                        style={{ textAlign: "center" }}
+                                        min={0}
+                                        maxLength="3"
+                                        onInput={maxLengthCheck}
                                       onChange={(e) =>
-                                        handleInputChange(e, index, "damageQty")
+                                        handleInputChange(
+                                          mssr.item_code,
+                                          "cls_stk_qty_damage",
+                                          e.target.value
+                                        )
                                       }
                                     />
                                   </td>
@@ -246,7 +257,8 @@
                                 <span className="cart-prod-val">
                                   <input
                                     disabled={
-                                      getStockEntryNO && getStockEntryNO.status_code == 0
+                                      getStockEntryNO &&
+                                      getStockEntryNO.status_code == 0
                                         ? false
                                         : true
                                     }
@@ -268,10 +280,12 @@
                                       }
                                     }}
                                     onChange={(e) =>
-                                      handleInputChange(e, index, "qtySaleable")
+                                      handleInputChange(
+                                        mssr.item_code,
+                                        "cls_stk_qty_saleable",
+                                        e.target.value
+                                      )
                                     }
-                                    // onChange ={(e)=>handleQtyChange(e,mssr,"qtySaleable")}
-
                                   />
                                 </span>
                               </div>
@@ -285,7 +299,8 @@
                                 <span className="cart-prod-val">
                                   <input
                                     disabled={
-                                      getStockEntryNO && getStockEntryNO.status_code == 0
+                                      getStockEntryNO &&
+                                      getStockEntryNO.status_code == 0
                                         ? false
                                         : true
                                     }
@@ -305,8 +320,16 @@
                                         event.preventDefault();
                                       }
                                     }}
+                                    // onChange={(e) =>
+                                    //   handleInputChange(e, index, "returnQty")
+                                    // }
+
                                     onChange={(e) =>
-                                      handleInputChange(e, index, "returnQty")
+                                      handleInputChange(
+                                        mssr.item_code,
+                                        "market_return_qty",
+                                        e.target.value
+                                      )
                                     }
                                   />
                                 </span>
@@ -319,9 +342,11 @@
                                 <span
                                   className="cart-prod-val"
                                   style={{ marginLeft: "47px" }}
-                                ><input
+                                >
+                                  <input
                                     disabled={
-                                      getStockEntryNO && getStockEntryNO.status_code == 0
+                                      getStockEntryNO &&
+                                      getStockEntryNO.status_code == 0
                                         ? false
                                         : true
                                     }
@@ -341,8 +366,16 @@
                                         event.preventDefault();
                                       }
                                     }}
+                                    // onChange={(e) =>
+                                    //   handleInputChange(e, index, "damageQty")
+                                    // }
+
                                     onChange={(e) =>
-                                      handleInputChange(e, index, "damageQty")
+                                      handleInputChange(
+                                        mssr.item_code,
+                                        "cls_stk_qty_damage",
+                                        e.target.value
+                                      )
                                     }
                                   />
                                 </span>
@@ -363,18 +396,10 @@
                         type="submit"
                         className="btn btn-primary  btn-md"
                         onClick={handleSubmit}
+                        disabled={getStockEntryNO.status_code == 0 ? false : true}
                       >
                         <i className="fa-solid fa-check mr-2"></i> Save
                       </button>
-                      {/*<button type="reset" className="btn btn-danger btn-md">
-                        <i className="fa-solid fa-xmark mr-2"></i> Reject
-                      </button>
-                      <button
-                        type="submit"
-                        className="btn btn-primary  btn-md"
-                        onClick={() => alert("window.location='PlaceOrder.html'")}>
-                        <i className="fa-solid fa-pen mr-2"></i> Edit Order
-                      </button>*/}
                     </div>
                   </div>
                 </div>

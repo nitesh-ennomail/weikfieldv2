@@ -10,6 +10,8 @@ import ViewOrderTable from "../../components/ViewOrder/ViewOrderTable";
 import MssrViewOrderTable from "../../components/MssrViewOrder/MssrViewOrderTable";
 import { setViewMssrFilter } from "../../redux/actions/mssrAction";
 import { Helmet } from "react-helmet";
+import MssrViewOrderModel from "../../components/MssrViewOrder/MssrViewOrderModel";
+
 const MssrViewOrder = () => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
@@ -64,6 +66,10 @@ const MssrViewOrder = () => {
 					</div>
 				</div>
 			</div>
+		
+            {/* <MssrViewOrderModel id="viewmssrorderpop" handleStatus={handleStatus}/> */}
+
+
 			{/* <DashBoardModel id="vieworderpop" /> */}
 		</>
 	);

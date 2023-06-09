@@ -27,10 +27,8 @@ function MssrViewOrderTable({ handleStatus }) {
   const dashboard = useSelector((state) => state.dashboard.dashboard);
   const { menu_details, profile_details } = dashboard;
   const mssr = useSelector((state) => state.mssr);
-  const { viewMssrFilter, viewMssrTotalPages } = mssr;
-  
+  const { viewMssrFilter, viewMssrTotalPages } = mssr;  
   const [loadingItems, setLoadingItems] = useState([]);
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
@@ -47,7 +45,6 @@ function MssrViewOrderTable({ handleStatus }) {
     ).then((response) => {
       // dispatch(getStockEntryNo(stock_entry_no));
       dispatch(getStockEntryNo(mssr));
-
       dispatch(getViewMssrDetailsLines(response.data.data.stock_line_details));
     });
     // getViewOrderDetails()
@@ -116,9 +113,12 @@ function MssrViewOrderTable({ handleStatus }) {
     );
     };
 
+    const reset = async() =>{
+      await dispatch(getViewMssrDetailsLines(null));
+    }
+
   return (
     <>
-      {/* {viewOrder && !isEmptyObject(viewOrder.viewMssrFilter) && ( */}
       {viewMssrFilter && viewMssrFilter !== null && (
         <div className="card border-0 rounded-0 mb-3">
           <div className="card-body">
@@ -223,38 +223,8 @@ function MssrViewOrderTable({ handleStatus }) {
                   )}
                 </tbody>
               </table>
-
-              {/* <Pagination
-                className="pagination-bar"
-                currentPage={currentPage}
-                totalCount={viewOrderTotalPages}
-                onPageChange={page => setCurrentPage(page)}
-              /> */}
-
-              {/* <nav >
-                <ul className="pagination">
-                  <li className="page-item">
-                  <a className="page-link"  onClick={ selectedPage>0 ?()=>selectedPageNumber(selectedPage-1):(event) => event.preventDefault()}>
-                      Previous
-                    </a>
-                  </li>
-                  {console.log("selectedPage", selectedPage)}
-                  {numbers.map((n, i) => (
-                  <li className={selectedPage === i ? "page-item active" : "page-item"} key={i}>
-                    <a className="page-link" onClick={() => selectedPageNumber(i)}>
-                      {n}
-                    </a>
-                  </li>
-                ))}
-                  <li className="page-item">
-                    <a className="page-link"  onClick={ numbers.length > selectedPage+1 ?()=>selectedPageNumber(selectedPage+1):(event) => event.preventDefault()}>
-                      Next
-                    </a>
-                  </li>
-                </ul>
-              </nav> */}
             </div>
-            <MssrViewOrderModel id="viewmssrorderpop" />
+            <MssrViewOrderModel id="viewmssrorderpop" reset={reset} />
           </div>
         </div>
       )}
