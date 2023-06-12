@@ -7,6 +7,7 @@ import { placeOrderReducer } from "./placeOrderReducer";
 import { viewOrderReducer } from "./viewOrderReducer";
 import { mssrReducer } from "./mssrReducer";
 import { distributorReducer } from "./distributorReducers";
+import { ndcReducer } from "./ndcReducer";
 
 const reducers = combineReducers({
 	allProducts: productReducer,
@@ -16,7 +17,8 @@ const reducers = combineReducers({
 	placeOrder: placeOrderReducer,
 	viewOrder: viewOrderReducer,
 	mssr: mssrReducer,
-	distributor: distributorReducer
+	distributor: distributorReducer,
+	ndc:ndcReducer
 });
 
 const rootReducer = (state, action) => {

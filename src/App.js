@@ -23,7 +23,8 @@ import Mssr from "./pages/pages/Mssr";
 import "datatables.net-dt/js/dataTables.dataTables";
 import "../node_modules/datatables.net-dt/css/jquery.dataTables.min.css";
 import MssrViewOrder from "./pages/pages/MssrViewOrder";
-import MyForm from "./pages/pages/MyForm";
+import MyForm from "./pages/pages/Ndc";
+import Ndc from "./pages/pages/Ndc";
 
 function App() {
 	useLayoutEffect(() => {
@@ -72,16 +73,6 @@ function App() {
               <>
                 <Header />
                 <MssrViewOrder />
-              </>
-            }
-          />
-
-          <Route
-            path="/test"
-            element={
-              <>
-                <Header />
-                <MyForm />
               </>
             }
           />
@@ -150,6 +141,16 @@ function App() {
             element={
               <>
                 <Logout />
+              </>
+            }
+          />
+
+          <Route
+            path="/fillndc"
+            element={
+              <>
+                <Header />
+                <Ndc />
               </>
             }
           />

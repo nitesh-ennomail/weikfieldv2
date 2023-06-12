@@ -12,6 +12,8 @@ import {
   setSelectedSalePerson,
   showPopUp,
 } from "../../redux/actions/placeOrderAction";
+import NDCService from "../../axios/services/api/ndc";
+import { setNdcExpiry, setNdcOtp } from "../../redux/actions/ndcAction";
 
 const Header = (props) => {
   const dispatch = useDispatch();
@@ -19,11 +21,17 @@ const Header = (props) => {
 
   const ref = useRef(null);
 
+	const userProfile = useSelector((state) => state.userProfile);
+
   const dashboard = useSelector((state) => state.dashboard.dashboard);
 
   const addTocart = useSelector((state) => state.placeOrder.addTocart);
 
   const showPopup = useSelector((state) => state.placeOrder.showPopUp);
+
+  const ndc = useSelector((state) => state.ndc);
+
+  const {otp, expiry_time} = ndc;
 
   const { menu_details, profile_details } = dashboard;
 
@@ -77,23 +85,59 @@ const Header = (props) => {
     }
   };
 
-  // useEffect(() => {
-  // 	if (addTocart.length>0 && window.location.pathname !== '/placeorder' && window.location.pathname !== '/modifyorder') {
-  // 		showPopUp()
-  // 	} else {
-  // 		return
-  // 	}
-  // },[window.location.pathname]);
 
-  // useEffect(() => {
-  // 	if(window.location.pathname === '/modifyorder'){
-  // 		alert(window.location.pathname)
-  // 	}else if(addTocart.length>0 && window.location.pathname !== '/placeorder'){
-  // 		showPopUp()
-  // 	}else{
-  // 		return
-  // 	}
-  // },[window.location.pathname]);
+  // const [otp,setOtp] = useState('');
+  // const [expireOtp, setExpiryOtp] = useState('');
+
+const checkOTP = async (otp,expiry) => {
+  const { value: remark } = await Swal.fire({
+    input: "text",
+    inputLabel: `Please enter the OTP received in mail!`,
+    inputPlaceholder: "Please Enter OTP",
+  });
+
+  // console.log("remark", remark);
+  // console.log("otp", otp);
+  // console.log("expiry_time", expiry_time);
+
+  if (remark == otp) {
+    console.log(remark);
+    // const targetDate = new Date('2023-06-12 23:10:51.596');
+    const targetDate = new Date(expiry);
+    const currentTime = new Date();
+    if (currentTime <= targetDate) {
+      Swal.fire("show page");
+      
+
+    } else {
+      Swal.fire("OTP expire");
+    }
+  } else {
+    Swal.fire("Wrong OTP!");
+  }
+};
+
+ const ndcLoginPopup = async()=>{
+   await Swal.fire({
+    title: 'This screen require OTP Do you want to continue?',
+    showCancelButton: true,
+    confirmButtonText: 'Confirm',
+  }).then((result) => {
+    if (result.isConfirmed) {
+       NDCService.sendOTP(userProfile).then(
+				(response) => {
+          console.log("opt api -- ",response.data.data);
+        // dispatch(setNdcOtp(response.data.data.otp))&&
+        // dispatch(setNdcExpiry(response.data.data.expiry_timestamp))&& 
+        checkOTP(response.data.data.otp,response.data.data.expiry_timestamp);
+
+				}
+			);
+    } else if (result.isDenied) {
+      Swal.fire('Changes are not saved', '', 'info')
+    }
+  })
+ }
 
   return (
     <nav
@@ -153,6 +197,23 @@ const Header = (props) => {
                 </Link>
               </li>
             ))}
+
+          <li
+            onClick={toggleClass}
+            className="nav-item"
+            data-toggle="tooltip"
+            data-placement="right"
+            title={"NDC"}
+          >
+            <span
+              className="nav-link"
+              // to={"#"}
+              onClick={() => ndcLoginPopup()}
+            >
+              <i className="fa fa-fw fa-dashboard"></i>
+              <span className="nav-link-text">{" send otp"}</span>
+            </span>
+          </li>
         </ul>
         <ul className="navbar-nav ml-auto" onClick={toggleClass}>
           <li className="nav-item dropdown profile_details_drop">
