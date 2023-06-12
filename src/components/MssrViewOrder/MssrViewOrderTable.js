@@ -18,7 +18,7 @@ import {
   setViewOrderTotalPages,
 } from "../../redux/actions/viewOrderAction";
 
-import { saveAs } from "file-saver";
+// import { saveAs } from "file-saver";
 import axios from "axios";
 import { baseURL } from "../../axios/shared/constants";
 
@@ -32,7 +32,7 @@ function MssrViewOrderTable({ handleStatus }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
-  const numbers = [...Array(viewMssrTotalPages + 1).keys()].slice(1);
+  // const numbers = [...Array(viewMssrTotalPages + 1).keys()].slice(1);
 
   const getOrderLines = async (mssr) => {
     console.log("MSSR", mssr);
