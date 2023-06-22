@@ -78,18 +78,11 @@ const request = function (options) {
 			// Request was made but server responded with something
 			// other than 2xx
 			if (error.response.data.status === 500) {
-				toast.error("User ID or Password entered is wrong");
 				localStorage.clear();
-				window.location.replace("/partner/");
+				toast.error(error.response.data.message);
+				// window.location.replace("/partner/");
 				// window.location.replace("/");
 			} else if (error.response.data.status === 501) {
-				// const newUserToken = await updateAccessToken();
-				// localStorage.setItem("token", JSON.stringify(newUserToken.token));
-				// store.dispatch({
-				// 	type: ActionTypes.SET_TOKEN,
-				// 	payload: newUserToken.token,
-				// });
-
                 /////////////////////////////////////
                 const originalRequest = error.config;
                 return refreshAccessToken().then(() => {

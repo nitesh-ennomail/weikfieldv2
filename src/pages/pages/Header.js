@@ -91,7 +91,7 @@ const Header = (props) => {
 
 const checkOTP = async (otp,expiry) => {
   const { value: remark } = await Swal.fire({
-    input: "text",
+    input: "number",
     inputLabel: `Please enter the OTP received in mail!`,
     inputPlaceholder: "Please Enter OTP",
   });
