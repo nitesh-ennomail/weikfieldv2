@@ -55,7 +55,7 @@ function MssrViewOrderTable({ handleStatus }) {
     let stock_entry_no = item.mssr_entry_no;
     let cur_status_code = item.status_code;
     const { value: remark } = await Swal.fire({
-      title: "Enter Validarion Remark ",
+      title: "Enter Validation Remark ",
       input: "text",
       inputPlaceholder: "Please Enter Remark",
     });

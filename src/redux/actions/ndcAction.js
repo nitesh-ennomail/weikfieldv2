@@ -13,6 +13,18 @@ export const setNdcExpiry = (expiry) => {
 		payload: expiry,
 	};
 };
+export const setNdcHeaderList = (ndc) => {
+	return {
+		type: ActionTypes.SET_NDC_HEADER_LIST,
+		payload: ndc,
+	};
+};
+export const getNdcDetailsLines = (ndc) => {
+	return {
+		type: ActionTypes.SET_NDC_DETAILS_LINES,
+		payload: ndc,
+	};
+};
 
 
 

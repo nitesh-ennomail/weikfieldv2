@@ -1,27 +1,20 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
-import NdcSearchBar from "../../components/Ndc/NdcSerchBar";
+import NdcViewSearchBar from "../../components/NdcView/NdcViewSearchBar";
+import NdcViewOrderTable from "../../components/NdcView/NdcViewOrderTable";
+const NdcView = () => {
 
-const Ndc = (props) => {
-  
-  useLayoutEffect(() => {
-    // handle css when component loads
-    document.body.classList.remove("loginBG");
-    document.body.classList.add(
-      "fixed-nav",
-      "sticky-footer",
-      "sidenav-toggled"
-    );
-  }, []);
+	const userProfile = useSelector((state) => state.userProfile);
 
+	useEffect(() => {
+	
+	}, []);
 
- 
-
-  return (
-    <>
-		<Helmet title="View MSSR" />
+	return (
+		<>
+		<Helmet title="Ndc View" />
 			<div className="content-wrapper">
 				<div className="container-fluid">
 					<div className="row">
@@ -31,22 +24,21 @@ const Ndc = (props) => {
 									{" "}
 									<Link to="/dashboard">Dashboard</Link>
 								</li>
-								<li className="breadcrumb-item active">View NDC</li>
+								<li className="breadcrumb-item active">Ndc View</li>
 							</ol>
 							<div className="row">
 								<div className="col-lg-12 mb-2">
-									<h4>List of NDC </h4>
+									<h4>List of NDC</h4>
 								</div>
 							</div>
-							<NdcSearchBar  />
+							 <NdcViewSearchBar/> 
+							<NdcViewOrderTable />
 						</div>
 					</div>
 				</div>
 			</div>
-		
-    
 		</>
-  );
+	);
 };
 
-export default Ndc;
+export default NdcView;

@@ -25,6 +25,7 @@ import "../node_modules/datatables.net-dt/css/jquery.dataTables.min.css";
 import MssrViewOrder from "./pages/pages/MssrViewOrder";
 import MyForm from "./pages/pages/Ndc";
 import Ndc from "./pages/pages/Ndc";
+import NdcView from "./pages/pages/NdcView";
 
 function App() {
 	useLayoutEffect(() => {
@@ -151,6 +152,15 @@ function App() {
               <>
                 <Header />
                 <Ndc />
+              </>
+            }
+          />
+          <Route
+            path="/viewndc"
+            element={
+              <>
+                <Header />
+                <NdcView />
               </>
             }
           />
