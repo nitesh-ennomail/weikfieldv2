@@ -7,6 +7,7 @@ const initialState = {
 	expiry_time:"null",
 	getNdcList : [],
 	getNdcDetailsLines :[],
+	ndcLoading:false
 
 };
 export const ndcReducer = (state = initialState, { type, payload }) => {
@@ -22,6 +23,9 @@ export const ndcReducer = (state = initialState, { type, payload }) => {
 
 			case ActionTypes.SET_NDC_DETAILS_LINES:
 				return { ...state, 	getNdcDetailsLines : payload };
+
+			case ActionTypes.SET_NDC_TABLE_LOADING:
+					return { ...state, 	ndcLoading : payload };
 		default:
 			return state;
 	}

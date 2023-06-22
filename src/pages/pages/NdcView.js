@@ -4,9 +4,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import NdcViewSearchBar from "../../components/NdcView/NdcViewSearchBar";
 import NdcViewOrderTable from "../../components/NdcView/NdcViewOrderTable";
+import { ColorRing } from "react-loader-spinner";
 const NdcView = () => {
 
 	const userProfile = useSelector((state) => state.userProfile);
+	const ndc = useSelector((state) => state.ndc);
+	const {ndcLoading} = ndc;
+
 
 	useEffect(() => {
 	
@@ -32,6 +36,21 @@ const NdcView = () => {
 								</div>
 							</div>
 							 <NdcViewSearchBar/> 
+							 {ndcLoading && <ColorRing
+											visible={true}
+											height="80"
+											width="100%"
+											ariaLabel="blocks-loading"
+											wrapperStyle={{}}
+											wrapperClass="blocks-wrapper"
+											colors={[
+												"#e15b64",
+												"#f47e60",
+												"#f8b26a",
+												"#abbd81",
+												"#849b87",
+											]}
+										/>}
 							<NdcViewOrderTable />
 						</div>
 					</div>

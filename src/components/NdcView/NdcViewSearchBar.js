@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import NDCService from "../../axios/services/api/ndc";
-import { setNdcHeaderList } from "../../redux/actions/ndcAction";
+import { setNdcHeaderList, setNdcTableLoading } from "../../redux/actions/ndcAction";
 
 import DatePicker from "react-datepicker";
 import {
@@ -14,20 +14,15 @@ import {
 function NdcViewSearchBar() {
   const dispatch = useDispatch();
 
-
-
   // Collecting data from Redux store
   const userProfile = useSelector((state) => state.userProfile);
-  const userId = useSelector(
-    (state) => state.dashboard.dashboard.profile_details.user_id
-  );
 
   const viewOrder = useSelector((state) => state.viewOrder);
   const { viewOrderFilter, viewOrderTotalPages, selectedPage } = viewOrder;
 
   const [ndcPeriods, setNdcPeriods] = useState(0);
   const [ndcStatus, setNdcStatus] = useState(0);
-  const [distributor, setDistributor] = useState(0);
+  const [distributor, setDistributor] = useState("");
 
   const [selectedNdcStatus, setSelectedNdcStatus] = useState(0);
   const [selectedDistributer, setSelectedDistributer] = useState(0);
@@ -44,6 +39,7 @@ function NdcViewSearchBar() {
   };
 
   const resetSearch = () => {
+    dispatch(setNdcHeaderList(""));
     setSelectedNdcPeriods(0);
     setSelectedDistributer(0);
     setSelectedNdcStatus(0);
@@ -51,9 +47,11 @@ function NdcViewSearchBar() {
 
   // on button submit
   const getNDCHeaderList = async (fromDate,toDate) => {
+    dispatch(setNdcHeaderList(""));
+    dispatch(setNdcTableLoading(true));
     const selectedPageN = 0;
     const limitNo = 10;
-        await NDCService.getNDCHeaderList(
+      await NDCService.getNDCHeaderList(
       userProfile,
       fromDate,
       toDate,
@@ -63,12 +61,15 @@ function NdcViewSearchBar() {
     ).then((response) => {
       console.log("response of headerList", response.data.data.ndc_header_details);
     dispatch(setNdcHeaderList(response.data.data.ndc_header_details));
+    dispatch(setNdcTableLoading(false));
+
     });
+    
+
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
     const [fromDate, toDate] = selectedNdcPeriods?.split("~");
      getNDCHeaderList(fromDate,toDate);
   };
@@ -150,22 +151,11 @@ function NdcViewSearchBar() {
                           // onChange={(e) =>
                           //   setSelectedDistributer(e.target.value)
                           // }
-                          value={distributor}
-                          required
+                          defaultValue={distributor}
+                          // required
                           readOnly
                         />
-                          {/* <option value={0}>Show All</option>
-
-                          {distributor &&
-                            distributor.map((dist, index) => (
-                              <option
-                                key={dist.customer_code}
-                                value={dist.customer_code}
-                              >
-                                {dist.customer_name}
-                              </option> 
-                            ))}*/}
-                        {/* </select> */}
+                          
                       </div>
                     </div>
                   </div>
@@ -214,8 +204,6 @@ function NdcViewSearchBar() {
                           onClick={handleSubmit}
                           type="submit"
                           className="btn btn-primary  btn-md"
-
-
                           data-toggle="collapse"
                                 data-target="#collapseOne"
                                 aria-expanded="false"

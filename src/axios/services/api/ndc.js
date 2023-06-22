@@ -123,8 +123,8 @@ function getNDCLineDetails(userProfile, ndc_entry_no) {
 			Authorization: `Bearer ${userProfile.token}`,
 		},
 		data: JSON.stringify({
-			ndc_entry_no:"NC2300001",
-			//  ndc_entry_no: ndc_entry_no,
+			// ndc_entry_no:"NC2300001",
+			 ndc_entry_no: ndc_entry_no,
 		}),
 	});
 }

@@ -106,9 +106,8 @@ const checkOTP = async (otp,expiry) => {
     const targetDate = new Date(expiry);
     const currentTime = new Date();
     if (currentTime <= targetDate) {
-      Swal.fire("show page");
-      
-
+      Swal.fire("Welcome to create MSSR!");
+      navigate('/createmssr');
     } else {
       Swal.fire("OTP expire");
     }

@@ -1,23 +1,19 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AuthService from "../../axios/services/api/auth";
+import Swal from "sweetalert2";
 
 function ForgotPassword() {
-
+	const navigate = useNavigate();
 	const forgetPassward = async (event) => {
       event.preventDefault();
       console.log(event.target[0].value);
       //AXIOS WRAPPER FOR API CALL
       let data = event.target[0].value;
       await AuthService.forgetPassward(data).then((response) => {
-
-		console.log(response)
-
-        // dispatch(setToken(response.data.token));
-
-       
+		Swal.fire(response.data.data.password_confirmation_response.message);
+		navigate('/');
       });
-
       //AXIOS WRAPPER FOR API CALL
     };
 
@@ -41,8 +37,8 @@ function ForgotPassword() {
 								</p>
 							</div>
 							<form onSubmit={forgetPassward}>
-								<div class="form-group">
-									<label for="InputUserid">Login ID</label>
+								<div className="form-group">
+									<label htmlFor="InputUserid">Login ID</label>
 									<input
 										className="form-control"
 										id="InputUserid"
@@ -54,7 +50,7 @@ function ForgotPassword() {
 								</div>
 								<input type="submit" className="btn btn-md btn-primary btn-block" />
 							</form>
-							<div class="text-center mt-4 mb-2">
+							<div className="text-center mt-4 mb-2">
 								<Link to="/">
 									<i className="fa-solid fa-arrow-left-long"></i> Back to login
 								</Link>

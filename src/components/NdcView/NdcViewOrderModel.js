@@ -197,7 +197,7 @@ const [changedData, setChangedData] = useState([]);
                 ))}
             </div>
           </div>
-          <div className="modal-footer text-center">
+          {/* <div className="modal-footer text-center">
             <button
               type="submit"
               className="btn btn-primary  btn-md"
@@ -205,7 +205,7 @@ const [changedData, setChangedData] = useState([]);
             >
               <i className="fa-solid fa-check mr-2"></i> Save
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

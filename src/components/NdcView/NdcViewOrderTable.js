@@ -10,8 +10,6 @@ import { getNdcDetailsLines } from "../../redux/actions/ndcAction";
 import { setSelectedOrder } from "../../redux/actions/placeOrderAction";
 import { saveAs } from 'file-saver';
 import NdcViewOrderModel from "./NdcViewOrderModel";
-
-// import { saveAs } from "file-saver";
 import axios from "axios";
 import { baseURL } from "../../axios/shared/constants";
 import NDCService from "../../axios/services/api/ndc";
@@ -48,28 +46,26 @@ function NdcViewOrderTable() {
         const url= ndc.upload_file_path;
         const parts = url.split("/")
         const filename = parts[parts.length - 1];
-        saveAs(url, 'image.jpg')
-
-
-        // const link = document.createElement('a');
-        // link.href = url;
-        // link.download =`${filename}`;
-        // document.body.appendChild(link);
-        // link.click();
-
-
-    //   const parts = url.split("/")
-    //   const filename = parts[parts.length - 1];
-    //     console.log("saveAs image file ",filename)
-        // saveAs(url, `${filename}`);
+        console.log("url", url);
+        console.log("filename", filename);
+        saveAs(url, filename)
       }
-  const rejectValidationStatus =(ndc)=>{
-    console.log("reject button clicked",ndc)
-  }
 
-  const setValidationStatus = async (item) => {
+    // const downloadIMG = () => {
+    //   const link = document.createElement('a');
+    //   link.href = 'https://weikfield-partner-portal-repo.s3.ap-south-1.amazonaws.com/weikfield-partner-portal-repo/1687260056072-New_Image.png';
+    //   link.download = 'New_Image.png';
+    //   document.body.appendChild(link);
+    //   link.click();
+    //   document.body.removeChild(link);
+    // };
+
+
+  const setValidationStatus = async (item, field) => {
     let ndc_entry_no = item.ndc_entry_no;
-    let cur_status_code = item.status_code;
+    let cur_status_code = field === "accept" ? (Number(item.status_code) +1): 99;
+
+    // console.log("cur_status_code", cur_status_code)
 
     const { value: remark } = await Swal.fire({
       title: "Enter Validation Remark ",
@@ -85,11 +81,13 @@ function NdcViewOrderTable() {
       ).then((response) => {
 
         Swal.fire(response.data.data.message);
+
+        navigate('/dashboard')
       });
     }else{
       Swal.fire({
         icon:"error",
-        text: " Plz Enter The Validation Remark "
+        text: " Please enter valide remark!"
       })
     }
   };
@@ -124,6 +122,7 @@ function NdcViewOrderTable() {
                   </tr>
                 </thead>
                 <tbody>
+
                   {getNdcList &&
                     getNdcList.map((ndc, index) => (
                       <tr key={index}>
@@ -166,7 +165,7 @@ function NdcViewOrderTable() {
                                 data-dismiss="modal"
                                 aria-label="Close"
                                 className="btn btn-dash-primary btn-sm mr-1"
-                                onClick={() => setValidationStatus(ndc)}
+                                onClick={() => setValidationStatus(ndc, "accept")}
                               >
                                 <i
                                   className="fa fa-check"
@@ -179,7 +178,7 @@ function NdcViewOrderTable() {
                                 data-dismiss="modal"
                                 aria-label="Close"
                                 className="btn btn-dash-danger btn-sm mr-2"
-                                onClick={() => rejectValidationStatus(ndc)}
+                                onClick={() => setValidationStatus(ndc, "reject")}
                               >
                                 <i className="fa-solid fa-xmark"></i>
                               </button>

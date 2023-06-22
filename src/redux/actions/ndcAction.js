@@ -26,5 +26,12 @@ export const getNdcDetailsLines = (ndc) => {
 	};
 };
 
+export const setNdcTableLoading = (state) => {
+	return {
+		type: ActionTypes.SET_NDC_TABLE_LOADING,
+		payload: state,
+	};
+};
+
 
 
