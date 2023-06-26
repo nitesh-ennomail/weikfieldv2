@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import NDCService from "../../axios/services/api/ndc";
 import { useNavigate } from "react-router-dom";
 import Swal from 'sweetalert2';
+import { maxLengthCheck } from "../../pages/pages/utils/maxLengthInput";
 function NdcSearchBar() {
   const dispatch = useDispatch();
   const navigate = useNavigate()
@@ -26,14 +27,10 @@ function NdcSearchBar() {
   const [formData, setFormData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [ImgFile, setImgFile] = useState('');
-
-
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    // const fileUrl = URL.createObjectURL(file);
-    setSelectedFile(file);
-  };
-
+  const [isCheckboxChecked, setIsCheckboxChecked] = useState(false);
+  const [approveCheckboxChecked, setApproveCheckboxChecked] = useState(true);
+  const [buttonClicked, setButtonClicked] = useState(false);
+  
   const getCreateNdcData = async () => {
     await NDCService.createNDC(userProfile).then((response) => {
       console.log("response", response.data);
@@ -46,6 +43,9 @@ function NdcSearchBar() {
   };
 
   const handleInputChange = (ndcTypeId, value, fieldName) => {
+    // const input1 = document.getElementById(`input1_${ndcTypeId}`)
+    // const input2 = document.getElementById(`input2_${ndcTypeId}`)
+
     const updatedValues = formData.map((ndc) => {
       if (ndc.ndc_type_id === ndcTypeId) {
         return {...ndc, [fieldName]: value};
@@ -55,28 +55,38 @@ function NdcSearchBar() {
     setFormData(updatedValues)
     }
 
-  const handleImgSubmit =async (e)=>{
-     e.preventDefault();
-    await NDCService.uploadFile(userProfile,selectedFile)
-    .then((response)=>{
-    console.log("response ==",response.data)
-     setImgFile(response.data)
+    const handleFileChange = async (event) => {
+      const selectedFile = event.target.files[0];
+      // const fileUrl = URL.createObjectURL(file);
+      await NDCService.uploadFile(userProfile,selectedFile)
+      .then((response)=>{
+      console.log("response ==",response.data)
+       setImgFile(response.data)
+      
+        setEnableSave(false)
+     
+          })
+          .catch((error)=>{
+          console.log({message : error})
+      })
+    };
+    const handleNoClaimCheckbox = () => {
     
-      setEnableSave(false)
-   
-        })
-        .catch((error)=>{
-        console.log({message : error})
-    })
-  };
+      setIsCheckboxChecked(!isCheckboxChecked);
 
+    };
 
+    const handleApproveCheckBox = ()=>{
+      setApproveCheckboxChecked(!approveCheckboxChecked)
+
+    }
+    console.log("handle approve",approveCheckboxChecked)
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const finalFilteredFormData = formData.filter((obj) => {
-      return obj.hasOwnProperty('detail_remark') && obj.hasOwnProperty('claim_amount') 
+      return obj.hasOwnProperty('detail_remark') || obj.hasOwnProperty('claim_amount') 
     });
     console.log("filtered form data formData",finalFilteredFormData);
 
@@ -187,12 +197,32 @@ if(finalFilteredFormData.length > 0){
                                 type="text"
                                 name="Distributor"
                                 className="form-control"
-                               value={distributor}
+                               defaultValue={distributor}
                                 readOnly
                             />
                         </div>
                     </div>
                 </div>
+              </div>
+              <div className="form-group row">
+                  <div className="col-md-6">
+                    <div className="row">
+                      <div className="col-md-4">
+                        <label htmlFor="noclaim" className="control-label">
+                          No Claim Pending:
+                        </label>
+                      </div>
+                      <div className="col-md-8">
+                      <input
+                      id="noClaim"
+                      className="form-check-label"
+                      type="checkbox"
+                      checked={isCheckboxChecked}
+                      onChange={handleNoClaimCheckbox}
+                        />
+                    </div>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="table-responsive">
@@ -203,11 +233,11 @@ if(finalFilteredFormData.length > 0){
                     cellSpacing="0"
                   >
                     <thead className="MuiTableHead-root">
-                      <tr>
-                        <th>Claim Type</th>
-                        <th>Details Remark</th>
-                        <th>Amount</th>
-                      </tr>
+                    <tr>
+                    <th style={{ textAlign: "center" }}>Claim Type</th>
+                    <th style={{ textAlign: "center" }}>Amount</th>
+                    <th style={{ textAlign: "center" }}>Details Remark </th>
+                  </tr>
                     </thead>
                     <tbody>
                     
@@ -217,33 +247,73 @@ if(finalFilteredFormData.length > 0){
                             <td className="text-nowrap">
                               {ndc.ndc_type_value}
                             </td>
-                            <td className="text-nowrap">
-                              <input
-                                style={{ textAlign: "right" }}
-                                type="text"
-                                onChange={(e) => handleInputChange(ndc.ndc_type_id, e.target.value, 'detail_remark')}
-                                  />
-                            </td>
-                            <td className="text-nowrap">
-                              <input
-                                style={{ textAlign: "right" }}
-                                type="number"
-                                min={1}
-                                // placeholder={"Enter closing stock"}
-                                onChange={(e) => handleInputChange(ndc.ndc_type_id, e.target.value, 'claim_amount')}
-                                onKeyPress={(event) => {
-                                  if (event.charCode < 48 || event.charCode > 58) {
-                                    event.preventDefault();
+                            <td className="text-nowrap"
+                            style={{ textAlign: "center" }}>
+                                <input
+                                  disabled={isCheckboxChecked}
+                                  style={{ textAlign: "right" }}
+                                  type="number"
+                                  min={1}
+                                  maxLength={9}
+                                  id={`input1_${ndc.ndc_type_id}`}
+                                  onChange={(e) => handleInputChange(ndc.ndc_type_id, e.target.value, 'claim_amount')}
+                                  onKeyPress={(event) => {
+                                    if ((event.charCode < 45 || event.charCode > 57) && event.charCode !== 46) {
+                                      event.preventDefault();
+                                    }
+                                    if (parseFloat(event.target.value) > 999999.99) {
+                                      event.preventDefault();
+                                    }
+                                  }}
+                                  onBlur={(event) => {
+                                  const value = parseFloat(event.target.value);
+                                  if (isNaN(value)) {
+                                    event.target.value = ''; // Clear the input if it's not a valid number
+                                  } else {
+                                    event.target.value = value.toFixed(2); // Round the number to two decimal places
                                   }
                                 }}
-                            />
+
+                                />
+                            </td>
+                            <td className="text-nowrap"
+                            style={{ textAlign: "center" }}>
+                              <input
+                              id={`input2_${ndc.ndc_type_id}`}
+                              disabled={isCheckboxChecked}
+                                style={{ textAlign: "right" }}
+                                type="text"
+                                onChange={(e) => handleInputChange(ndc.ndc_type_id, e.target.value , 'detail_remark')}/>
                             </td>
                           </tr> 
                         ))}
                     </tbody>
                   </table>
                 </div>
-              
+                <div className="row">
+                      <div className="row">
+                <div className="col-md-12">
+                  <p htmlFor="approveclaim" className="control-label">
+                    I hereby confirm that the above details filled by me are correct to the best of my knowledge.
+                  </p>
+                </div>
+                <div className="col-md-12">
+                  <div className="form-check">
+                    <input
+                      id="approveClaim"
+                      className="form-check-input"
+                      type="checkbox"
+                      checked={!approveCheckboxChecked}
+                      onChange={handleApproveCheckBox}
+                    />
+                    <label className="form-check-label" htmlFor="approveClaim">
+                      I agree to the terms and conditions.
+                    </label>
+                  </div>
+                </div>
+              </div>
+              </div>
+           
                 <div className="row">
                   <div className="col-md-6">
                     <span>
@@ -253,28 +323,23 @@ if(finalFilteredFormData.length > 0){
                         onChange={handleFileChange}
                       />
                       <button className="btn btn-primary btn-md"
-                        onClick={handleImgSubmit}
+                         //  disabled={enableSave && approveCheckboxChecked}
+                           disabled={enableSave }
+                          onClick={handleSubmit}
+                          type="submit"
                       >
-                        <i className="fa-solid fa-upload"></i> upload img
+                        <i className="fa-solid fa-save"></i> Save
                       </button>
                     </span>
                   </div>
                 </div>
 
-                <div
+                {/* <div
                   className="col-md-8 text-right"
                   style={{ position: "relative" }}
                 >
-                  <button
-                  disabled={enableSave}
-                    onClick={handleSubmit}
-                    type="submit"
-                    className="btn btn-primary btn-md"
-                    style={{ position: "absolute", top: 10, left: 0 }}
-                  >
-                    <i className="fa-solid fa-save"></i> Save
-                  </button>
-                </div>
+                  
+                </div> */}
               </form>
             </div>
           </div>
