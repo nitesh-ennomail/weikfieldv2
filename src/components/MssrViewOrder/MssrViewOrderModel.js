@@ -109,7 +109,7 @@ useEffect(() => {
                   <div className="modal-content">
                     <div className="modal-header">
                       <h5 className="modal-title" id="exampleModalLabel">
-                        View MSSR Line Details
+                        View MSSR Status - {getViewStockDetailsLines && getViewStockDetailsLines[0].ui_status}
                       </h5>
                       <button
                         className="close"
@@ -143,7 +143,7 @@ useEffect(() => {
                                 Market Return Qty
                               </th>
                               <th>Expiry Qty</th>
-                              <th>Status</th>
+                              {/* <th>Status</th> */}
                             </tr>
                           </thead>
 
@@ -224,7 +224,7 @@ useEffect(() => {
                                       }
                                     />
                                   </td>
-                                  <td>{mssr.ui_status}</td>
+                                  {/* <td>{mssr.ui_status}</td> */}
                                 </tr>
                               ))}
                           </tbody>
@@ -381,12 +381,12 @@ useEffect(() => {
                                 </span>
                               </div>
 
-                              <div className="cart-prod-desc">
+                              {/* <div className="cart-prod-desc">
                                 <span className="cart-prod-lbl">Status : </span>
                                 <span className="cart-prod-val">
                                   {mssr.ui_status}
                                 </span>
-                              </div>
+                              </div> */}
                             </div>
                           ))}
                       </div>

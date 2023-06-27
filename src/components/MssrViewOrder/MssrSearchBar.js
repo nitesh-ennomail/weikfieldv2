@@ -15,7 +15,7 @@ import {
   setViewMssrTotalRecord,
 } from "../../redux/actions/mssrAction";
 import { convert } from "../../pages/pages/utils/dateConverter";
-import $ from "jquery";
+import toast, { Toaster } from "react-hot-toast";
 function MssrSearchBar({ channel }) {
   const dispatch = useDispatch();
 
@@ -97,8 +97,12 @@ function MssrSearchBar({ channel }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(selectedMssrPagesNumber(0));
-    getViewOrderDetails();
+    if (!month ) {
+      toast.error("Please select a month!");
+    }else{
+        dispatch(selectedMssrPagesNumber(0));
+        getViewOrderDetails();
+      }
   };
 
   useEffect(() => {
@@ -207,6 +211,7 @@ function MssrSearchBar({ channel }) {
                       <div className="col-md-8">
                         <DatePicker
                          showIcon
+                         required
                          className="form-control monthpicker"
                           selected={selectedDate}
                           value={month}

@@ -65,31 +65,61 @@ function NdcViewOrderTable() {
     let ndc_entry_no = item.ndc_entry_no;
     let cur_status_code = field === "accept" ? (Number(item.status_code) +1): 99;
 
+    if(field == 'accept'){
+     
+      const { value: remark } = await Swal.fire({
+        title: "Enter Approve Validation Remark ",
+        input: "text",
+        inputPlaceholder: "Please Enter The Remark",
+      });
+      if (remark) {
+        await NDCService.setValidationStatus(
+          userProfile,
+          ndc_entry_no,
+          cur_status_code,
+          remark,
+        ).then((response) => {
+  
+          Swal.fire(response.data.data.message);
+  
+           navigate('/dashboard')
+        });
+      }else{
+        Swal.fire({
+          icon:"error",
+          text: " Please enter valide remark!"
+        })
+      }
+    }else{   // api call when user click reject button 
+      // console.log(field)   
+      const { value: remark } = await Swal.fire({
+        title: "Enter Reject Validation Remark ",
+        input: "text",
+        inputPlaceholder: "Please Enter The Remark",
+      });
+      if (remark) {
+        await NDCService.setNDCRejectStatus(
+          userProfile,
+          ndc_entry_no,
+          remark,
+        ).then((response) => {
+        console.log("response on reject ndc ====",response.data)
+          // Swal.fire(response.data.data.message);
+  
+          navigate('/dashboard')
+        });
+      }else{
+        Swal.fire({
+          icon:"error",
+          text: " Please enter valide remark!"
+        })
+      }
+
+    }
+
     // console.log("cur_status_code", cur_status_code)
 
-    const { value: remark } = await Swal.fire({
-      title: "Enter Validation Remark ",
-      input: "text",
-      inputPlaceholder: "Please Enter Remark",
-    });
-    if (remark) {
-      await NDCService.setValidationStatus(
-        userProfile,
-        ndc_entry_no,
-        cur_status_code,
-        remark,
-      ).then((response) => {
-
-        Swal.fire(response.data.data.message);
-
-        navigate('/dashboard')
-      });
-    }else{
-      Swal.fire({
-        icon:"error",
-        text: " Please enter valide remark!"
-      })
-    }
+ 
   };
 
     const reset = async() =>{
@@ -98,7 +128,7 @@ function NdcViewOrderTable() {
 
   return (
     <>
-      {getNdcList && getNdcList.length !== 0 && (
+      {getNdcList && getNdcList !== null && (
         <div className="card border-0 rounded-0 mb-3">
           <div className="card-body">
             <div className="table-responsive">
@@ -157,7 +187,7 @@ function NdcViewOrderTable() {
 
                         <td style={{ textAlign: "center" }}>
 
-                          {profile_details.user_id == ndc.pending_with_uid  && Number(ndc.status_code) < 5
+                          {profile_details.user_id == ndc.created_uid  && Number(ndc.status_code) == 0
                            ? (
                             <div>
                               <button
@@ -184,7 +214,7 @@ function NdcViewOrderTable() {
                               </button>
 
                             </div>
-                          ) : (
+                           ) : (
                             <span className="text-danger text-nowrap">
                               {ndc.ui_status}
                             </span>
@@ -209,7 +239,8 @@ function NdcViewOrderTable() {
                       <td></td>
                       <td></td>
                       <td></td>
-                      <td className="text-nowrap">No data found </td>
+                      <td></td>
+                      <td className="text-nowrap"><h5> No data found </h5></td>
                       <td></td>
                       <td></td>
                       <td></td>

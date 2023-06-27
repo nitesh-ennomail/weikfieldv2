@@ -67,8 +67,6 @@ function MssrViewOrderTable({ handleStatus }) {
         remark.toUpperCase()
       ).then((response) => {
         Swal.fire(response.data.data.message);
-        // handleStatus()
-        // window.location.reload(true)
       });
       navigate("/dashboard");
     }

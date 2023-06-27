@@ -150,6 +150,25 @@ function setValidationStatus(
 	});
 }
 
+function setNDCRejectStatus(
+	userProfile,
+	ndc_entry_no,
+	remark,
+	){
+	return request({
+		url: `ndc/setNDCRejectStatus`,
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+			Authorization: `Bearer ${userProfile.token}`,
+		},
+		data: JSON.stringify({
+			ndc_entry_no:ndc_entry_no,
+			
+			vaidation_remarks:remark,
+		}),
+	});
+}
 
 const NDCService = {
 	sendOTP,
@@ -160,6 +179,7 @@ const NDCService = {
 	saveNDC,
 	getNDCLineDetails,
 	setValidationStatus,
+	setNDCRejectStatus,
 	
 };
 

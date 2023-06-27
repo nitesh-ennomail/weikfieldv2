@@ -5,7 +5,10 @@ import { Helmet } from "react-helmet";
 import NdcSearchBar from "../../components/Ndc/NdcSerchBar";
 
 const Ndc = (props) => {
+	const navigate = useNavigate();
   
+	const userProfile = useSelector((state) => state.userProfile);
+
   useLayoutEffect(() => {
     // handle css when component loads
     document.body.classList.remove("loginBG");
@@ -16,12 +19,23 @@ const Ndc = (props) => {
     );
   }, []);
 
+  const [showComponent,setShowComponent] = useState(false)
+  useEffect(() => {
+	if (userProfile.usertype !== "null") {
+		window.scrollTo({ top: 0, behavior: "smooth" });
+		setShowComponent(true)
+	} else {
+		navigate("/");
+	}
+}, []);
+
 
  
 
   return (
     <>
 		<Helmet title="View MSSR" />
+		{showComponent &&
 			<div className="content-wrapper">
 				<div className="container-fluid">
 					<div className="row">
@@ -43,8 +57,7 @@ const Ndc = (props) => {
 					</div>
 				</div>
 			</div>
-		
-    
+}
 		</>
   );
 };
