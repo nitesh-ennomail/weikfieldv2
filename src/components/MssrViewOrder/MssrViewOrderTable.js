@@ -78,21 +78,15 @@ function MssrViewOrderTable({ handleStatus }) {
   };
 
   const downloadPDF = async(mssr) => {
-
     setLoadingItems((prevLoadingItems) => [...prevLoadingItems, mssr]);
-
-    const filePath = mssr.download_path;
-    const fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
-    const fileUrl = `${baseURL}/dashboard/downloadFile/test.pdf`;
-    // const fileUrl = `${baseURL}/dashboard/downloadFile/${fileName}`;
-    console.log("fileName : ", fileName)
-
+    const fileName = mssr.mssr_entry_no;
+    const fileUrl = `${baseURL}/dashboard/downloadFile/${fileName}`;
    await fetch(fileUrl,{
       method: 'GET', 
       headers: {
       //   'Content-Type': 'application/json', // Replace with the desired content type
       //   'Authorization': `Bearer ${userProfile.token}`, // Replace with your actual authorization token
-      // Add any additional headers as needed
+      //    Add any additional headers as needed
       },
       })
       .then(response => response.blob())
@@ -100,8 +94,8 @@ function MssrViewOrderTable({ handleStatus }) {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      // link.download = `${fileName}`;
-      link.download = `test.pdf`;
+      link.download = `${fileName}`;
+      // link.download = `CS2300044`;
       link.click();
       URL.revokeObjectURL(url);
       })
