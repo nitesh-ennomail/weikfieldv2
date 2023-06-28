@@ -10,29 +10,27 @@ function NdcSearchBar() {
   // Collecting data from Redux store
   const userProfile = useSelector((state) => state.userProfile);
 
-  
-
-  useEffect(() => {
-    if (userProfile.usertype !== "null") {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } else {
-      navigate("/");
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (userProfile.usertype !== "null") {
+  //     window.scrollTo({ top: 0, behavior: "smooth" });
+  //   } else {
+  //     navigate("/");
+  //   }
+  // }, []);
 
   const userId = useSelector(
     (state) => state.dashboard.dashboard.profile_details.user_id
   );
 
   const [ndcPeriods, setNdcPeriods] = useState(0);
-  const [ndcPeriodFrom, setNdcPeriodFrom] = useState(0);
-  const [ndcPeriodTo, setNdcPeriodTo] = useState(0);
+  const [ndcPeriodFrom, setNdcPeriodFrom] = useState("");
+  const [ndcPeriodTo, setNdcPeriodTo] = useState("");
   const [enableSave, setEnableSave] = useState(true);
   const [detailRemark, setDetailRemark] = useState(0);
   const [amount, setAmount] = useState(0);
-  const [distributor, setDistributor] = useState(0);
+  const [distributor, setDistributor] = useState("");
   const [ndcType, setNdcType] = useState([]);
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedFileUpload, setSelectedFile] = useState(null);
   const [formData, setFormData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [ImgFile, setImgFile] = useState("");
@@ -59,26 +57,63 @@ function NdcSearchBar() {
     });
     setFormData(updatedValues);
   };
-  const [selectedUpFile, setSelectedUpFile] = useState(null);
+  // const [selectedUpFile, setSelectedUpFile] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
 
+  // const handleFileChange = async (event) => {
+  //   setSelectedFile(null)
+  //   setErrorMessage(null)
+  //   setEnableSave(true);
+  //   const selectedFile = event.target.files[0];
+  //   setSelectedFile(selectedFile.name)
+  //   const fileType = selectedFile.type;
+  //   if (fileType === "text/javascript") {
+  //     setSelectedUpFile(null);
+  //     setErrorMessage("JavaScript files (.js) are not allowed.");
+  //   } else {
+  //     setSelectedUpFile(selectedFile);
+  //     setErrorMessage("");
+  //   }
+  //   await NDCService.uploadFile(userProfile, selectedFile)
+  //     .then((response) => {
+  //       setImgFile(response.data);
+  //       setEnableSave(false);
+  //     })
+  //     .catch((error) => {
+  //       console.log({ message: error });
+  //     });
+    
+  // };
+
+
   const handleFileChange = async (event) => {
-    setSelectedFile(null)
-    setErrorMessage(null)
+    if (approveCheckboxChecked) {
+      Swal.fire("Please check the checkbox before uploading the image.");
+      return;
+    }
+  
+    setSelectedFile(null);
+    setErrorMessage(null);
     setEnableSave(true);
     const selectedFile = event.target.files[0];
-    setSelectedFile(selectedFile.name)
-    const fileType = selectedFile.type;
-    if (fileType === "text/javascript") {
-      setSelectedUpFile(null);
-      setErrorMessage("JavaScript files (.js) are not allowed.");
-    } else {
-      setSelectedUpFile(selectedFile);
-      setErrorMessage("");
+    // File size validation
+    const maxSizeInBytes = 4 * 1024 * 1024; // 4MB
+    if (selectedFile.size > maxSizeInBytes) {
+      Swal.fire("File size exceeds the maximum allowed limit (4MB).");
+      return;
     }
-
-    // setSelectedUpFile(selectedFile)
-    await NDCService.uploadFile(userProfile, selectedFile)
+  
+    // File type validation
+    const allowedFileTypes = ["image/jpeg", "image/png", "application/pdf"];
+    if (!allowedFileTypes.includes(selectedFile.type)) {
+      Swal.fire("Invalid file type. Please upload a PDF, JPEG or PNG image.");
+      return;
+    }
+  
+    setSelectedFile(selectedFile.name);
+  
+    // Perform the rest of the file handling tasks and upload
+      await NDCService.uploadFile(userProfile, selectedFile)
       .then((response) => {
         setImgFile(response.data);
         setEnableSave(false);
@@ -148,7 +183,7 @@ function NdcSearchBar() {
       Swal.fire({
         icon: "warning",
         title: "NO DATA FOUND",
-        text: "Plz fill details and amount ",
+        text: "Please fill details and amount ",
         showCancelButton: false,
         showCloseButton: false,
         confirmButtonColor: "#3085d6",
@@ -193,10 +228,10 @@ function NdcSearchBar() {
                       </div>
                       <div className="col-md-8">
                         <input
+                          type="text"
                           name="OrderNumber"
-                          className="form-control selectpicker"
-                          data-live-search="true"
-                          value={ndcPeriodFrom + "~" + ndcPeriodTo}
+                          className="form-control"
+                          placeholder={ndcPeriodFrom + "~" + ndcPeriodTo}
                           readOnly
                         />
                       </div>
@@ -205,7 +240,7 @@ function NdcSearchBar() {
                   <div className="col-md-6">
                     <div className="row">
                       <div className="col-md-4">
-                        <label htmlFor="SalePerson" className="control-label">
+                        <label htmlFor="Distributor" className="control-label">
                           Distributor:
                         </label>
                       </div>
@@ -359,11 +394,12 @@ function NdcSearchBar() {
                         type="file"
                         id="fileInput"
                         style={{ display: "none" }}
+                        // disabled={approveCheckboxChecked}
                         onChange={handleFileChange}
                       />
-                      Upload a text file
+                      Upload file
                     </label>
-                    <span className="ml-3" style={{ fontSize: "12px", lineHeight:"40px", }}>{selectedFile && selectedFile}</span>
+                    <span className="ml-3" style={{ fontSize: "12px", lineHeight:"40px", }}>{selectedFileUpload && selectedFileUpload}</span>
                     <br/>
                     {errorMessage && (
                     <span style={{ fontSize: "12px", lineHeight:"40px", color:"red" }}>{errorMessage}</span>
@@ -372,8 +408,11 @@ function NdcSearchBar() {
                   <div className="col-md-6 mt-2 mt-md-0">
                     <button
                       className="btn btn-primary btn-md"
+                      // disabled={
+                      //   !selectedUpFile || enableSave || approveCheckboxChecked
+                      // }
                       disabled={
-                        !selectedUpFile || enableSave || approveCheckboxChecked
+                        enableSave || approveCheckboxChecked || !selectedFileUpload
                       }
                       onClick={handleSubmit}
                       type="submit"

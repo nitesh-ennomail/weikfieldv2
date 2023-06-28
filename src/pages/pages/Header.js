@@ -117,6 +117,8 @@ const checkOTP = async (otp,expiry) => {
 };
 
  const ndcLoginPopup = async()=>{
+
+  if(profile_details && profile_details.ndc_completion_flag === "0"){
    await Swal.fire({
     title: 'This screen require OTP Do you want to continue?',
     showCancelButton: true,
@@ -136,6 +138,11 @@ const checkOTP = async (otp,expiry) => {
       Swal.fire('Changes are not saved', '', 'info')
     }
   })
+}else{
+  Swal.fire("NDC is already submitted for the Open Period.")
+}
+
+
  }
 
   return (

@@ -29,12 +29,9 @@ const Ndc = (props) => {
 	}
 }, []);
 
-
- 
-
   return (
     <>
-		<Helmet title="View MSSR" />
+		<Helmet title="NDC" />
 		{showComponent &&
 			<div className="content-wrapper">
 				<div className="container-fluid">
