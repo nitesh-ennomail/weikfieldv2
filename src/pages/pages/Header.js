@@ -33,7 +33,7 @@ const Header = (props) => {
 
   const {otp, expiry_time} = ndc;
 
-  const { menu_details, profile_details } = dashboard;
+  const { menu_details, profile_details, show_otp_menu_flag } = dashboard;
 
   const showpopUp = async (link) => {
     let title = `OOPS! You will loose CART data,Press Exit to come out or Cancel to be in ${link}`;
@@ -203,7 +203,7 @@ const checkOTP = async (otp,expiry) => {
                 </Link>
               </li>
             ))}
-
+{show_otp_menu_flag === 1 &&
           <li
             onClick={toggleClass}
             className="nav-item"
@@ -216,10 +216,12 @@ const checkOTP = async (otp,expiry) => {
               // to={"#"}
               onClick={() => ndcLoginPopup()}
             >
-              <i className="fa fa-fw fa-dashboard"></i>
-              <span className="nav-link-text">{" send otp"}</span>
+              <i className="fa fa-inr"></i>
+              <span className="nav-link-text">&nbsp;Send otp</span>
             </span>
           </li>
+}
+
         </ul>
         <ul className="navbar-nav ml-auto" onClick={toggleClass}>
           <li className="nav-item dropdown profile_details_drop">
@@ -245,14 +247,14 @@ const checkOTP = async (otp,expiry) => {
               </div>
             </a>
             <ul className="dropdown-menu drp-mnu">
-              <li>
+              {/* <li>
                 <Link
                   to="/myprofile"
                   onClick={() => showPopUps(window.location.pathname)}
                 >
                   <i className="fa fa-user"></i> Manage Profile
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <Link to="/logout">
                   <i className="fa fa-sign-out"></i> Logout

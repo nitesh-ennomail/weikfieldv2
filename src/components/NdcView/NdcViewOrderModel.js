@@ -8,7 +8,7 @@ import {maxLengthCheck} from "../../pages/pages/utils/maxLengthInput"
 import Swal from "sweetalert2";
 const NdcViewOrderModel = ({ id, reset }) => {
   const ndc = useSelector((state) => state.ndc);
-  const { getNdcDetailsLines } = ndc;
+  const { getNdcDetailsLines, getNdcList } = ndc;
   const navigate = useNavigate()
   const userProfile = useSelector((state) => state.userProfile);
   const [qtySaleableData, setQtySaleableData] = useState([]);
@@ -108,7 +108,8 @@ const [changedData, setChangedData] = useState([]);
         <div className="modal-content">
           <div className="modal-header">
             <h5 className="modal-title" id="exampleModalLabel">
-              View NDC Line Details
+              View NDC Line Details <br/>
+            <span>Customer Name : {getNdcList && getNdcList[0].customer_name}</span>  
             </h5>
             <button
               className="close"

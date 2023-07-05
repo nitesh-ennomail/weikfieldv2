@@ -8,12 +8,11 @@ import { userType } from "../../pages/pages/constants/constants";
 import { setOrderLine } from "../../redux/actions/dashboardAction";
 import { getNdcDetailsLines } from "../../redux/actions/ndcAction";
 import { setSelectedOrder } from "../../redux/actions/placeOrderAction";
-import { saveAs } from 'file-saver';
 import NdcViewOrderModel from "./NdcViewOrderModel";
 import axios from "axios";
 import { baseURL } from "../../axios/shared/constants";
 import NDCService from "../../axios/services/api/ndc";
-
+// import { saveAs } from 'file-saver';
 function NdcViewOrderTable() {
   const userProfile = useSelector((state) => state.userProfile);
   const dashboard = useSelector((state) => state.dashboard.dashboard);
@@ -41,25 +40,26 @@ function NdcViewOrderTable() {
     });
   };
 
+  // const downloadIMG = async (e, ndc) =>{
+  //       //  e.preventDefault()
+  //        console.log(ndc.upload_file_path)
+  //        const link = document.createElement('a');
+  //        link.href = 'https://weikfield-partner-portal-repo.s3.ap-south-1.amazonaws.com/aqua_invoice.pdf';
+  //        link.download = 'aqua_invoice.pdf';
+  //        link.click();
+  //     }
+
   const downloadIMG = async (e, ndc) =>{
-         e.preventDefault()
-        const url= ndc.upload_file_path;
-        const parts = url.split("/")
-        const filename = parts[parts.length - 1];
-        console.log("url", url);
-        console.log("filename", filename);
-        saveAs(url, filename)
-      }
 
-    // const downloadIMG = () => {
-    //   const link = document.createElement('a');
-    //   link.href = 'https://weikfield-partner-portal-repo.s3.ap-south-1.amazonaws.com/weikfield-partner-portal-repo/1687260056072-New_Image.png';
-    //   link.download = 'New_Image.png';
-    //   document.body.appendChild(link);
-    //   link.click();
-    //   document.body.removeChild(link);
-    // };
-
+    const {upload_file_path } = ndc;
+    const fileUrl = `${upload_file_path}`;
+    const filename = fileUrl.substring(fileUrl.lastIndexOf('/') + 1);
+    const link = document.createElement('a');
+    link.href = fileUrl;
+    link.download = `${filename}`;
+    link.target = '_blank';
+    link.click();
+        };
 
   const setValidationStatus = async (item, field) => {
     let ndc_entry_no = item.ndc_entry_no;

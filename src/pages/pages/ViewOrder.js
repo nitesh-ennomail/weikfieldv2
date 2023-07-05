@@ -14,6 +14,10 @@ const ViewOrder = () => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 	const userProfile = useSelector((state) => state.userProfile);
+	const viewOrder = useSelector((state) => state.viewOrder);
+
+	const {viewOrderTotalPages} = viewOrder;
+
 
 	const [channel, setChannel] = useState(0);
 
@@ -59,7 +63,9 @@ const ViewOrder = () => {
 								</div>
 							</div>
 							{channel && <SearchBar channel={channel} /> }
+							{viewOrderTotalPages !==0 &&
 							<ViewOrderTable handleStatus={getViewOrderChannelFilter}/>
+}
 						</div>
 					</div>
 				</div>

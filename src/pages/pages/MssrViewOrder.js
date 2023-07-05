@@ -16,6 +16,9 @@ const MssrViewOrder = () => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 	const userProfile = useSelector((state) => state.userProfile);
+	const mssr = useSelector((state) => state.mssr);
+	const {orderDetails} = mssr;
+
 
 	const [channel, setChannel] = useState(0);
 
@@ -61,7 +64,10 @@ const MssrViewOrder = () => {
 								</div>
 							</div>
 							{channel && <MssrSearchBar channel={channel} /> }
-							<MssrViewOrderTable handleStatus={getViewStockDetailsChannelFilter}/>
+
+							{orderDetails != 'null' ?
+							<MssrViewOrderTable handleStatus={getViewStockDetailsChannelFilter}/> : <div style={{textAlign:"center"}}>No data found</div>
+							} 
 						</div>
 					</div>
 				</div>

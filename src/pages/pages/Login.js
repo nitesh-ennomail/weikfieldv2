@@ -79,6 +79,7 @@ const Login = () => {
 								<img
 									src="assets/images/Weikfield-Logo.svg"
 									className="img-fluid my-3"
+									alt="logo"
 									width="179"
 								/>
 								<h3 className=" my-4">Partner Portal</h3>

@@ -8,6 +8,12 @@
           import Swal from "sweetalert2";
           const ViewOrderModel = ({ id, reset }) => {
             const mssr = useSelector((state) => state.mssr);
+            const dashboard = useSelector((state) => state.dashboard.dashboard);
+            const {profile_details} = dashboard;
+
+
+            // profile_details.user_id
+
             const { getViewStockDetailsLines, getStockEntryNO } = mssr;
             const navigate = useNavigate()
             const userProfile = useSelector((state) => state.userProfile);
@@ -157,10 +163,7 @@ useEffect(() => {
                                     <input
                                       defaultValue={mssr.cls_stk_qty_saleable}
                                       disabled={
-                                        getStockEntryNO &&
-                                        getStockEntryNO.status_code == 0
-                                          ? false
-                                          : true
+                                        profile_details.user_id === getStockEntryNO.created_by_uid && getStockEntryNO.status_code == 0 ? false :true
                                       }
                                       type="number"
                                       id={`saleableStockQty-${mssr.item_code}`}
@@ -181,10 +184,7 @@ useEffect(() => {
                                     <input
                                       defaultValue={mssr.market_return_qty}
                                       disabled={
-                                        getStockEntryNO &&
-                                        getStockEntryNO.status_code == 0
-                                          ? false
-                                          : true
+                                        profile_details.user_id === getStockEntryNO.created_by_uid && getStockEntryNO.status_code == 0 ? false :true
                                       }
                                       type="number"
                                       id={`saleableStockQty-${mssr.item_code}`}
@@ -205,9 +205,7 @@ useEffect(() => {
                                     <input
                                       defaultValue={mssr.cls_stk_qty_damage}
                                       disabled={
-                                        getStockEntryNO && getStockEntryNO.status_code == 0
-                                          ? false
-                                          : true
+                                        profile_details.user_id === getStockEntryNO.created_by_uid && getStockEntryNO.status_code == 0 ? false :true
                                       }
                                         type="number"
                                         id={`saleableStockQty-${mssr.item_code}`}
@@ -257,10 +255,7 @@ useEffect(() => {
                                 <span className="cart-prod-val">
                                   <input
                                     disabled={
-                                      getStockEntryNO &&
-                                      getStockEntryNO.status_code == 0
-                                        ? false
-                                        : true
+                                      profile_details.user_id === getStockEntryNO.created_by_uid && getStockEntryNO.status_code == 0 ? false :true
                                     }
                                     id={`saleableStockQty-${mssr.item_code}`}
                                     style={{ textAlign: "right" }}
@@ -299,10 +294,7 @@ useEffect(() => {
                                 <span className="cart-prod-val">
                                   <input
                                     disabled={
-                                      getStockEntryNO &&
-                                      getStockEntryNO.status_code == 0
-                                        ? false
-                                        : true
+                                      profile_details.user_id === getStockEntryNO.created_by_uid && getStockEntryNO.status_code == 0 ? false :true
                                     }
                                     style={{ textAlign: "right" }}
                                     min={0}
@@ -345,10 +337,7 @@ useEffect(() => {
                                 >
                                   <input
                                     disabled={
-                                      getStockEntryNO &&
-                                      getStockEntryNO.status_code == 0
-                                        ? false
-                                        : true
+                                      profile_details.user_id === getStockEntryNO.created_by_uid && getStockEntryNO.status_code == 0 ? false :true
                                     }
                                     style={{ textAlign: "right" }}
                                     min={0}
@@ -394,9 +383,8 @@ useEffect(() => {
                     <div className="modal-footer text-center">
                       <button
                         type="submit"
-                        className="btn btn-primary  btn-md"
+                        className={`btn btn-primary btn-md ${profile_details.user_id == getStockEntryNO.created_by_uid && getStockEntryNO.status_code == 0 ? '' :'d-none'}`}
                         onClick={handleSubmit}
-                        disabled={getStockEntryNO && getStockEntryNO.status_code == 0 ? false : true}
                       >
                         <i className="fa-solid fa-check mr-2"></i> Save
                       </button>

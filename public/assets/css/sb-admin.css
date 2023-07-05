@@ -1859,6 +1859,11 @@ input[type=number] {
 		text-decoration: line-through !important;
 	  }
 
+	  .btn-disabled{
+		background-color: grey;
+		color:#fff
+	  }
+
 
 	 
 

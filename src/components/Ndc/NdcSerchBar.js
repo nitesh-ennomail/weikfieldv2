@@ -60,38 +60,11 @@ function NdcSearchBar() {
   // const [selectedUpFile, setSelectedUpFile] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
 
-  // const handleFileChange = async (event) => {
-  //   setSelectedFile(null)
-  //   setErrorMessage(null)
-  //   setEnableSave(true);
-  //   const selectedFile = event.target.files[0];
-  //   setSelectedFile(selectedFile.name)
-  //   const fileType = selectedFile.type;
-  //   if (fileType === "text/javascript") {
-  //     setSelectedUpFile(null);
-  //     setErrorMessage("JavaScript files (.js) are not allowed.");
-  //   } else {
-  //     setSelectedUpFile(selectedFile);
-  //     setErrorMessage("");
-  //   }
-  //   await NDCService.uploadFile(userProfile, selectedFile)
-  //     .then((response) => {
-  //       setImgFile(response.data);
-  //       setEnableSave(false);
-  //     })
-  //     .catch((error) => {
-  //       console.log({ message: error });
-  //     });
-    
-  // };
-
-
   const handleFileChange = async (event) => {
     if (approveCheckboxChecked) {
       Swal.fire("Please check the checkbox before uploading the image.");
       return;
     }
-  
     setSelectedFile(null);
     setErrorMessage(null);
     setEnableSave(true);
@@ -124,6 +97,9 @@ function NdcSearchBar() {
   };
   const handleNoClaimCheckbox = () => {
     setIsCheckboxChecked(!isCheckboxChecked);
+
+    // const resetInputValues = formData.map(() => 0);
+    // setFormData(resetInputValues);
   };
 
   const handleApproveCheckBox = () => {
@@ -135,19 +111,23 @@ function NdcSearchBar() {
     let finalFilteredFormData=[]
 
     if(isCheckboxChecked){
-
-      finalFilteredFormData=[{"ndc_type_value":"No Claim","ndc_type_id":"N099","claim_amount":"0","detail_remark":"No Claim Pending"}]
-
-
+      finalFilteredFormData=[{"ndc_type":"No Claim","claim_amount":"0","detail_remark":"No Claim Pending"}]
     }else {
+      finalFilteredFormData = formData.map(item => {
+        const { ndc_type_value, ndc_type_id, claim_amount,detail_remark } = item;
+        const claimAmount = parseInt(claim_amount) || 0;
+        const detailRemark = detail_remark !== undefined ? detail_remark : "Nill";
+        return {
+          ndc_type:ndc_type_value,
+          claim_amount:claimAmount,
+          detail_remark:detailRemark
+        };
+      });
 
-     finalFilteredFormData = formData.filter((obj) => {
-      return (
-        obj.hasOwnProperty("detail_remark") ||
-        obj.hasOwnProperty("claim_amount")
-      );
-    });
+  console.log(formData);
   }
+
+console.log("finalFilteredFormData", finalFilteredFormData);
 
     if (finalFilteredFormData.length > 0) {
       await NDCService.saveNDC(
@@ -174,7 +154,6 @@ function NdcSearchBar() {
           },
         }).then((result) => {
           if (result.isConfirmed) {
-            // Navigate to the dashboard page
             navigate("/dashboard");
           }
         });
@@ -295,16 +274,33 @@ function NdcSearchBar() {
                           <tr key={index}>
                             <td className="text-nowrap">
                               {ndc.ndc_type_value}
+                              <span
+                                className="ml-1"
+                                style={{
+                                  color: "red",
+                                  fontSize: "1.2rem",
+                                  fontWeight: "600",
+                                }}
+                              >
+                                *
+                              </span>
                             </td>
-                            <td style={{textAlign:"center"}}
-                              // className="text-nowrap"
-                              // className="text-center"
-                            >
+                            <td style={{ textAlign: "center" }}>
                               <input
+                                value={
+                                  !isCheckboxChecked &&
+                                  formData[index].claim_amount !== undefined
+                                    ? formData[index].claim_amount
+                                    : 0
+                                }
+                                required
                                 disabled={isCheckboxChecked}
                                 className="form-control form-control-sm"
-                                style={{ textAlign: "right", width: "100%",  border:"1px solid grey" }}
-                             
+                                style={{
+                                  textAlign: "right",
+                                  width: "100%",
+                                  border: "1px solid grey",
+                                }}
                                 type="number"
                                 min={1}
                                 maxLength={9}
@@ -318,7 +314,7 @@ function NdcSearchBar() {
                                 }
                                 onKeyPress={(event) => {
                                   if (
-                                    (event.charCode < 45 ||
+                                    (event.charCode <= 45 ||
                                       event.charCode > 57) &&
                                     event.charCode !== 46
                                   ) {
@@ -330,13 +326,22 @@ function NdcSearchBar() {
                                     event.preventDefault();
                                   }
                                 }}
-                                onBlur={(event) => {
-                                  const value = parseFloat(event.target.value);
-                                  if (isNaN(value)) {
-                                    event.target.value = ""; // Clear the input if it's not a valid number
-                                  } else {
-                                    event.target.value = value.toFixed(2); // Round the number to two decimal places
+                                onFocus={(e) => {
+                                  if(e.target.value==0){
+                                  e.target.value = "";
+                                  }else{
+                                    return
                                   }
+                                }}
+                                onBlur={(e) => {
+
+                                  if(e.target.value===""){
+                                    e.target.value=0
+                                  }else{
+                                    return
+                                  }
+
+                                
                                 }}
                               />
                             </td>
@@ -345,11 +350,21 @@ function NdcSearchBar() {
                               style={{ textAlign: "center" }}
                             >
                               <input
+                                required
+                                value={
+                                  !isCheckboxChecked &&
+                                  formData[index].detail_remark !== undefined
+                                    ? formData[index].detail_remark
+                                    : "Nill"
+                                }
                                 id={`input2_${ndc.ndc_type_id}`}
                                 disabled={isCheckboxChecked}
                                 className="form-control form-control-sm"
-                                style={{ textAlign: "right", width: "100%", border:"1px solid grey"}}
-                                // style={{ textAlign: "right", width: "80px", border:"1px solid grey" }}
+                                style={{
+                                  textAlign: "right",
+                                  width: "100%",
+                                  border: "1px solid grey",
+                                }}
                                 type="text"
                                 onChange={(e) =>
                                   handleInputChange(
@@ -358,6 +373,21 @@ function NdcSearchBar() {
                                     "detail_remark"
                                   )
                                 }
+
+                                onFocus={(e) => {
+                                  if(e.target.value=="Nill"){
+                                  e.target.value = "";
+                                  }else{
+                                    return
+                                  }
+                                }}
+                                onBlur={(e) => {
+                                  if(e.target.value===""){
+                                    e.target.value="Nill"
+                                  }else{
+                                    return
+                                  }
+                                }}
                               />
                             </td>
                           </tr>
@@ -379,9 +409,8 @@ function NdcSearchBar() {
                         className="form-check-label"
                         htmlFor="approveClaim"
                       >
-                        {/* I agree to the terms and conditions. */}I hereby
-                        confirm that the above details filled by me are correct
-                        to the best of my knowledge.
+                        I hereby confirm that the above details filled by me are
+                        correct to the best of my knowledge.
                       </label>
                     </div>
                   </div>
@@ -389,28 +418,41 @@ function NdcSearchBar() {
 
                 <div className="row mt-3">
                   <div className="col-md-6">
-                    <label htmlFor="fileInput" className="btn btn btn-md btn-primary">
+                    <label
+                      htmlFor="fileInput"
+                      className={`btn btn btn-md ${approveCheckboxChecked ? 'btn-disabled' : 'btn-primary'}`}
+                    >
                       <input
                         type="file"
                         id="fileInput"
                         style={{ display: "none" }}
-                        // disabled={approveCheckboxChecked}
+                        disabled={approveCheckboxChecked}
                         onChange={handleFileChange}
                       />
-                      Upload file
+                     <i className="fa fa-upload"></i> Upload file
                     </label>
-                    <span className="ml-3" style={{ fontSize: "12px", lineHeight:"40px", }}>{selectedFileUpload && selectedFileUpload}</span>
-                    <br/>
+                    <span
+                      className="ml-3"
+                      style={{ fontSize: "12px", lineHeight: "40px" }}
+                    >
+                      {selectedFileUpload && selectedFileUpload}
+                    </span>
+                    <br />
                     {errorMessage && (
-                    <span style={{ fontSize: "12px", lineHeight:"40px", color:"red" }}>{errorMessage}</span>
-                  )}
+                      <span
+                        style={{
+                          fontSize: "12px",
+                          lineHeight: "40px",
+                          color: "red",
+                        }}
+                      >
+                        {errorMessage}
+                      </span>
+                    )}
                   </div>
                   <div className="col-md-6 mt-2 mt-md-0">
                     <button
                       className="btn btn-primary btn-md"
-                      // disabled={
-                      //   !selectedUpFile || enableSave || approveCheckboxChecked
-                      // }
                       disabled={
                         enableSave || approveCheckboxChecked || !selectedFileUpload
                       }
